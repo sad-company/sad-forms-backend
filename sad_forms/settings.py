@@ -101,7 +101,9 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'uk'
 
-TIME_ZONE = 'Europe/Kyiv'
+# NOTE(DP): Should be "Europe/Kyiv" but
+#           https://code.djangoproject.com/ticket/30239
+TIME_ZONE = 'Europe/Kiev'
 
 USE_I18N = True
 
