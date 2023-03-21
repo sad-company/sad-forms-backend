@@ -1,3 +1,8 @@
-from django.shortcuts import render
+from django.http import HttpRequest, HttpResponse, HttpResponseNotAllowed
 
-# Create your views here.
+
+def form_view(request: HttpRequest) -> HttpResponse:
+    if request.method != "GET":
+        return HttpResponseNotAllowed("GET")
+
+    raise NotImplementedError()
