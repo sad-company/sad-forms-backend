@@ -24,7 +24,11 @@ SECRET_KEY = 'django-insecure-ypxf#m%bs5$yc-40*_np59rc1l-%xji)*kvh&m^ijsh*q2p-4!
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# NOTE(DP): based on
+#           https://fly.io/blog/deploying-django-to-production/
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'sad-forms.fly.dev']
+
+CSRF_TRUSTED_ORIGINS = ['https://sad-forms.fly.dev/']
 
 # Application definition
 
