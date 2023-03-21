@@ -1,3 +1,10 @@
-fly.toml
 .git/
+.idea/
+.venv/
+
+.gitignore
+fly.toml
+Dockerfile
+README.md
+
 *.sqlite3
