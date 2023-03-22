@@ -16,9 +16,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
-from forms.views import form_view
+from forms.views import form_view, form_view_by_form_id
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('form/', form_view)
+    path('form/', form_view),
+    path('form/<str:form_id>', form_view_by_form_id)
 ]
