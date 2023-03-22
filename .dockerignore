@@ -1,6 +1,7 @@
 .git/
 .idea/
 .venv/
+.github/
 
 .gitignore
 fly.toml
