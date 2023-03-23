@@ -1,3 +1,4 @@
+from django.core.exceptions import ObjectDoesNotExist
 from django.forms.models import model_to_dict
 from django.http import HttpRequest, HttpResponse, HttpResponseNotAllowed, JsonResponse, HttpResponseNotFound
 
@@ -15,13 +16,20 @@ def form_view(request: HttpRequest) -> HttpResponse:
 
 
 def form_view_by_form_id(request: HttpRequest, form_id: str) -> HttpResponse:
-    if request.method != "GET":
-        return HttpResponseNotAllowed("GET")
+    if request.method == "GET":
+        try:
+            form = Form.objects.get(form_id=form_id)
+        except ObjectDoesNotExist:
+            return HttpResponseNotFound()
+        form_json = model_to_dict(form)
+        return JsonResponse(form_json)
 
-    form = Form.objects.get(form_id=form_id)
+    if request.method == "DELETE":
+        try:
+            form = Form.objects.get(form_id=form_id)
+        except ObjectDoesNotExist:
+            return HttpResponseNotFound()
+        form.delete()
+        return HttpResponse()
 
-    if form is None:
-        return HttpResponseNotFound()
-
-    form_json = model_to_dict(form)
-    return JsonResponse(form_json)
+    return HttpResponseNotAllowed("GET", "DELETE")
