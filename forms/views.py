@@ -1,5 +1,10 @@
+import json
+
+from django.db import DatabaseError
+from django.db.transaction import atomic
 from django.forms.models import model_to_dict
 from django.http import HttpRequest, HttpResponse, HttpResponseNotAllowed, JsonResponse, HttpResponseNotFound
+from jsonschema import validate
 
 from .dtos import FormCreateDto
 from .models import Form
@@ -13,10 +18,16 @@ def form_view(request: HttpRequest) -> HttpResponse:
 
     if request.method == "POST":
         data = FormCreateDto(request.POST)
-
         if data.is_valid():
-            Form.objects.create(**data.cleaned_data)
-            return HttpResponse()
+            try:
+                validate(instance=data.cleaned_data['questions'], schema=FORM_CREATE_QUESTIONS_JSONSCHEMA)
+                with atomic():
+                    Form.objects.create(**data.cleaned_data)
+            except DatabaseError as e:
+                print(f"WARNING:DB: {e}")
+                return HttpResponse(status=500)
+
+            return HttpResponse(status=200)
 
         return HttpResponse(status=400)
 
@@ -43,3 +54,11 @@ def form_view_by_form_id(request: HttpRequest, form_id: str) -> HttpResponse:
         return HttpResponse()
 
     return HttpResponseNotAllowed("GET", "DELETE")
+
+
+def load_form_create_questions_jsonschema():
+    with open('forms/json_schemas/form_create_questions.json', 'r') as raw_json_schema:
+        return json.load(raw_json_schema)
+
+
+FORM_CREATE_QUESTIONS_JSONSCHEMA = load_form_create_questions_jsonschema()
