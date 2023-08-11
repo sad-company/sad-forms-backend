@@ -1,10 +1,11 @@
 import json
 
 from django.db import DatabaseError
-from django.db.transaction import atomic
 from django.forms.models import model_to_dict
-from django.http import HttpRequest, HttpResponse, HttpResponseNotAllowed, JsonResponse, HttpResponseNotFound
+from django.http import HttpRequest, HttpResponse, HttpResponseNotAllowed, JsonResponse, HttpResponseNotFound, \
+    HttpResponseBadRequest
 from jsonschema import validate
+from jsonschema.exceptions import ValidationError
 
 from .dtos import FormCreateDto
 from .models import Form
@@ -18,18 +19,21 @@ def form_view(request: HttpRequest) -> HttpResponse:
 
     if request.method == "POST":
         data = FormCreateDto(request.POST)
-        if data.is_valid():
-            try:
-                validate(instance=data.cleaned_data['questions'], schema=FORM_CREATE_QUESTIONS_JSONSCHEMA)
-                with atomic():
-                    Form.objects.create(**data.cleaned_data)
-            except DatabaseError as e:
-                print(f"WARNING:DB: {e}")
-                return HttpResponse(status=500)
+        if not data.is_valid():
+            return HttpResponseBadRequest("Form is not valid!")
+        try:
+            validate(instance=data.cleaned_data['questions'], schema=FORM_CREATE_QUESTIONS_JSONSCHEMA)
+        except ValidationError as validation:
+            print(f'{validation} - wrong')
+            return HttpResponse(status=400)
+        
+        try:
+            Form.objects.create(**data.cleaned_data)
+        except DatabaseError as e:
+            print(f"WARNING:DB: {e}")
+            return HttpResponse(status=500)
 
-            return HttpResponse(status=200)
-
-        return HttpResponse(status=400)
+        return HttpResponse(status=200)
 
     return HttpResponseNotAllowed("GET", "POST")
 
