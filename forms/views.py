@@ -60,7 +60,7 @@ def form_view_by_form_id(request: HttpRequest, form_id: str) -> HttpResponse:
 
 
 def load_form_create_questions_jsonschema():
-    with open('json_schemas/form_create_questions.json', 'r') as raw_json_schema:
+    with open('forms/json_schemas/form_create_questions.json', 'r') as raw_json_schema:
         return json.load(raw_json_schema)
 
 
