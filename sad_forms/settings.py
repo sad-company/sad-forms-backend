@@ -9,10 +9,28 @@ https://docs.djangoproject.com/en/4.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
+import json
 from os import getenv
 from pathlib import Path
 
 from dotenv import load_dotenv
+from jsonschema import validate
+from jsonschema.exceptions import ValidationError
+
+
+def load_the_environment_variable_validation_scheme() -> {json}:
+    with open('json_schemas/validation_of_environment_variables.json', 'r') as raw_json_schema:
+        return json.load(raw_json_schema)
+
+
+def validator_env(environment_variables: dict[str, str]) -> None:
+    ENVIRONMENT_VARIABLES_JSON = load_the_environment_variable_validation_scheme()
+    try:
+        validate(instance=environment_variables, schema=ENVIRONMENT_VARIABLES_JSON)
+    except ValidationError as e:
+        print(f"Environment variable validation error:\n{e}")
+        raise e
+
 
 load_dotenv()
 
@@ -80,6 +98,9 @@ WSGI_APPLICATION = 'sad_forms.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
+validator_env(
+    {'DB_HOST': getenv('DB_HOST'), 'DB_PORT': getenv('DB_PORT'), 'DB_NAME': getenv('DB_NAME'),
+     'DB_USER': getenv('DB_USER'), 'DB_PASSWORD': getenv('DB_PASSWORD')})
 
 DATABASES = {
     'default': {
