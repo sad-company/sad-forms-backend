@@ -2,7 +2,7 @@ import unittest
 
 from jsonschema.exceptions import ValidationError
 
-from sad_forms.settings import validator_env
+from sad_forms.common.env_validator import EnvValidator
 
 
 class TestEnvironmentVariableValidation(unittest.TestCase):
@@ -10,7 +10,7 @@ class TestEnvironmentVariableValidation(unittest.TestCase):
         environment = {'DB_HOST': '1', 'DB_PORT': '2', 'DB_NAME': '3',
                        'DB_USER': '4', 'DB_PASSWORD': '5'}
         try:
-            validator_env(environment)
+            EnvValidator.validate(environment)
         except ValidationError as e:
             self.assertRaises(ValidationError)
 
@@ -18,7 +18,7 @@ class TestEnvironmentVariableValidation(unittest.TestCase):
         environment = {'DB_HOST': 'sadsadsa', 'DB_PORT': 'asdsad', 'DB_NAME': 'cxzczx',
                        'DB_USER': 'adsad', 'DB_PASSWORD': 'AAAAAA'}
         try:
-            validator_env(environment)
+            EnvValidator.validate(environment)
         except ValidationError as e:
             self.assertRaises(ValidationError)
 
@@ -26,7 +26,7 @@ class TestEnvironmentVariableValidation(unittest.TestCase):
         environment = {'DB_HOST': '', 'DB_PORT': '', 'DB_NAME': '',
                        'DB_USER': '', 'DB_PASSWORD': ''}
         try:
-            validator_env(environment)
+            EnvValidator.validate(environment)
         except ValidationError as e:
             self.assertRaises(ValidationError)
 
@@ -34,11 +34,11 @@ class TestEnvironmentVariableValidation(unittest.TestCase):
         environment = {'DB_HOST': '128,0,0,1', 'DB_PORT': '5238', 'DB_NAME': 'postgres',
                        'DB_USER': 'root', 'DB_PASSWORD': 'root'}
         try:
-            validator_env(environment)
+            EnvValidator.validate(environment)
         except ValidationError as e:
             self.assertRaises(ValidationError)
 
     def test_when_everything_is_correct(self):
         environment = {'DB_HOST': '128.0.0.1', 'DB_PORT': '5238', 'DB_NAME': 'postgres',
                        'DB_USER': 'root', 'DB_PASSWORD': 'root'}
-        self.assertIsNone(validator_env(environment))
+        self.assertIsNone(EnvValidator.validate(environment))
