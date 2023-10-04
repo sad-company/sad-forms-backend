@@ -1,4 +1,5 @@
 import json
+import logging
 from pathlib import Path
 
 from jsonschema import validate
@@ -10,7 +11,7 @@ class EnvValidator:
     def __load_json_schema():
         current_dir = Path(__file__).parent.absolute()
 
-        with open(current_dir / '..' / 'json_schemas/validation_of_environment_variables.json', 'r') as raw_json_schema:
+        with open(current_dir / '..' / 'json_schemas/environment_variables.json', 'r') as raw_json_schema:
             return json.load(raw_json_schema)
 
     @staticmethod
@@ -19,6 +20,5 @@ class EnvValidator:
         try:
             validate(instance=environment_variables, schema=json_schema)
         except ValidationError as e:
-            # TODO: use logger instead of print
-            print(f"Environment variable validation error:\n{e}")
+            logging.error(f"Environment variable validation error:\n{e}")
             raise e
