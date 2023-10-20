@@ -14,7 +14,7 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-from common.env_validator import EnvValidator
+from sad_forms.common.env_validator import EnvValidator
 
 load_dotenv()
 
@@ -83,7 +83,7 @@ WSGI_APPLICATION = 'sad_forms.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 EnvValidator.validate(
-    {'DB_HOST': getenv('DB_HOST'), 'DB_PORT': getenv('DB_PORT'), 'DB_NAME': getenv('DB_NAME'),
+    {'DB_HOST': getenv('DB_HOST'), 'DB_PORT': int(getenv('DB_PORT')), 'DB_NAME': getenv('DB_NAME'),
      'DB_USER': getenv('DB_USER'), 'DB_PASSWORD': getenv('DB_PASSWORD')})
 
 DATABASES = {
